@@ -31,7 +31,7 @@ const sendMessage = async (channelId, content) => {
   if (json.id) {
     console.log(`[+] Sent to ${channelId}: ${json.content}`);
 
-    // Auto-delete setelah 3 detik
+    // Auto-delete setelah 1 detik
     setTimeout(async () => {
       await fetch(`https://discord.com/api/v9/channels/${channelId}/messages/${json.id}`, {
         method: 'DELETE',
@@ -40,7 +40,7 @@ const sendMessage = async (channelId, content) => {
         }
       });
       console.log(`[x] Deleted from ${channelId}: ${json.content}`);
-    }, 3000); // 3 detik
+    }, 1000); // 1000 ms = 1 detik
 
   } else {
     console.log(`[!] Failed to send to ${channelId}:`, json);
