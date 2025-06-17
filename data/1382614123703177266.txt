@@ -1,2 +1,10 @@
-Ini pesan otomatis untuk channel tambahan.
-Pesan kedua untuk test.
+!crystal
+!rawr
+!gm
+!nice
+!lmao
+!wagmi
+!water
+!fire
+!dyno
+!morning
