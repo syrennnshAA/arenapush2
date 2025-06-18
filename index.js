@@ -48,7 +48,7 @@ const sendMessage = async (channelId, content) => {
 };
 
 (async () => {
-  console.log("Bot aktif dengan auto-delete 3 detik...");
+  console.log("Bot aktif dengan auto-delete 1 detik...");
   while (true) {
     for (const ch of channels) {
       const message = getMessageForChannel(ch.id);
