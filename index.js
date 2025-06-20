@@ -1,8 +1,9 @@
-
 import 'dotenv/config';
 import fs from 'fs';
 import fetch from 'node-fetch';
 import delay from 'delay';
+
+const AUTO_DELETE_DELAY = parseInt(process.env.AUTO_DELETE_DELAY_MS || '500');
 
 const bots = Object.entries(process.env)
   .filter(([key]) => key.startsWith('TOKEN'))
@@ -25,27 +26,36 @@ const getMessageForChannel = (channelId) => {
 };
 
 const sendMessage = async (token, channelId, content) => {
-  const res = await fetch(`https://discord.com/api/v9/channels/${channelId}/messages`, {
-    method: 'POST',
-    headers: {
-      'Authorization': token,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ content, tts: false })
-  });
+  try {
+    const res = await fetch(`https://discord.com/api/v9/channels/${channelId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ content, tts: false })
+    });
 
-  const json = await res.json();
-  if (json.id) {
-    console.log(`[+] ${channelId}: ${json.content}`);
-    setTimeout(async () => {
-      await fetch(`https://discord.com/api/v9/channels/${channelId}/messages/${json.id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': token }
-      });
-      console.log(`[x] Deleted from ${channelId}: ${json.content}`);
-    }, 5000); // Auto-delete after 5 detik
-  } else {
-    console.log(`[!] Failed to send to ${channelId}:`, json);
+    const json = await res.json();
+
+    if (json.id) {
+      console.log(`[+] ${channelId}: ${json.content}`);
+      setTimeout(async () => {
+        try {
+          await fetch(`https://discord.com/api/v9/channels/${channelId}/messages/${json.id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': token }
+          });
+          console.log(`[x] Deleted from ${channelId}: ${json.content}`);
+        } catch (err) {
+          console.error(`[!] Failed to delete message from ${channelId}:`, err.message);
+        }
+      }, AUTO_DELETE_DELAY);
+    } else {
+      console.warn(`[!] Failed to send to ${channelId}:`, json);
+    }
+  } catch (err) {
+    console.error(`[!] Error sending to ${channelId}:`, err.message);
   }
 };
 
